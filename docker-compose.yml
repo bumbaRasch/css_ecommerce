@@ -1,4 +1,67 @@
 services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - FAVORITE_PRODUCTS_COUNT=${FAVORITE_PRODUCTS_COUNT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - redis
+      - mysql-customers
+      - mysql-products
+    restart: unless-stopped
+    networks:
+      - redis-network
+      - customers-network
+      - product-network
+
+  customers-service:
+    build:
+      context: .
+      dockerfile: apps/customers-service/Dockerfile
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MYSQL_CUSTOMERS_URL=${MYSQL_CUSTOMERS_URL}
+    depends_on:
+      mysql-customers:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - redis-network
+      - customers-network
+    # Run Prisma migrations and start the service
+    command: sh -c "npx prisma db push --schema=./apps/customers-service/prisma/schema.prisma && node dist/apps/customers-service/main.js"
+
+  products-service:
+    build:
+      context: .
+      dockerfile: apps/products-service/Dockerfile
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MYSQL_PRODUCTS_URL=${MYSQL_PRODUCTS_URL}
+    depends_on:
+      mysql-products:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - redis-network
+      - product-network
+    # Run Prisma migrations and start the service
+    command: sh -c "npx prisma db push --schema=./apps/products-service/prisma/schema.prisma && node dist/apps/products-service/main.js"
   mysql-customers:
     image: mysql:8.0
     environment:
