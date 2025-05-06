@@ -118,6 +118,14 @@ ecommerce-monorepo-challenge/
 | `/api/customers`     | GET    | Retrieve all customers                    |
 | `/api/customers/:id` | GET    | Get customer by ID with favorite products |
 
+### 📝 API Documentation (Swagger)
+
+Interactive API documentation is available via Swagger UI:
+
+- [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+
+You can explore all endpoints, view request/response schemas, and try out requests directly from your browser.
+
 ### Check API
 
 The API is available at: http://localhost:3000/api/customers
