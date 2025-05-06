@@ -1,0 +1,86 @@
+services:
+  mysql-customers:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_CUSTOMERS_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_CUSTOMERS_USER}
+      MYSQL_PASSWORD: ${MYSQL_CUSTOMERS_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_CUSTOMERS_DATABASE}
+      TZ: ${TZ}
+
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'mysql-customers']
+      timeout: 20s
+      retries: 10
+    ports:
+      - '${MYSQL_CUSTOMERS_PORT}:3306'
+    volumes:
+      - mysql_customers_data:/var/lib/mysql
+      - ./mysql-customers-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - customers-network
+      - adminer-network
+
+  mysql-products:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PRODUCTS_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_PRODUCTS_USER}
+      MYSQL_PASSWORD: ${MYSQL_PRODUCTS_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_PRODUCTS_DATABASE}
+      TZ: ${TZ}
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'mysql-products']
+      timeout: 20s
+      retries: 10
+    ports:
+      - '${MYSQL_PRODUCTS_PORT}:3306'
+    volumes:
+      - mysql_products_data:/var/lib/mysql
+      - ./mysql-products-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - product-network
+      - adminer-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - '${REDIS_PORT}:6379'
+    command: ['redis-server', '--requirepass', '${REDIS_PASSWORD}']
+    volumes:
+      - redis:/data
+    restart: unless-stopped
+    networks:
+      - redis-network
+
+  adminer:
+    image: adminer
+    ports:
+      - '${ADMINER_PORT}:8080'
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_DB_DRIVER: mysql
+      ADMINER_DESIGN: price
+    depends_on:
+      - mysql-customers
+      - mysql-products
+    networks:
+      - adminer-network
+
+networks:
+  customers-network:
+    driver: bridge
+  product-network:
+    driver: bridge
+  redis-network:
+    driver: bridge
+  adminer-network:
+    driver: bridge
+
+volumes:
+  mysql_customers_data:
+  mysql_products_data:
+  redis:
+    driver: local
