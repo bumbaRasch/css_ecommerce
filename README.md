@@ -1,98 +1,191 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🚀 Ecommerce NestJS Microservices Challenge
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white)](https://redis.io/)
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Overview
 
-## Description
+A microservices application for managing customers and products in an e-commerce platform built with modern technologies. This project demonstrates architectural patterns for scalable backend systems using message-based communication.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🏗️ Architecture
 
-## Project setup
+The system consists of three microservices:
 
-```bash
-$ npm install
+- **API Gateway** — HTTP API that handles external requests and orchestrates inter-service communication
+- **Customers Service** — Manages customer data with its dedicated MySQL database
+- **Products Service** — Handles product information with its dedicated MySQL database
+
+Communication between services is implemented via Redis as a message broker, following event-driven architecture patterns.
+
+## 🔧 Technologies Used
+
+- **Backend Framework**: NestJS
+- **Language**: TypeScript
+- **Message Broker**: Redis
+- **Databases**: MySQL
+- **API Style**: RESTful
+- **Container Orchestration**: Docker & Docker Compose
+- **ORM**: Prisma
+
+## 🗄️ Why I Chose Separate Databases for Each Service
+
+I decided to give each microservice (Customers and Products) its own dedicated MySQL database. Here’s why I believe this is the right approach for this project:
+
+- **Loose Coupling:** Services don’t share database schemas or direct access, which keeps their domains clearly separated and independent.
+- **Security & Privacy:** Customer data often contains sensitive, personally identifiable information (personenbezogene Daten). By isolating this data in its own database, I can reduce the risk of accidental exposure and apply stricter access controls, which is important for privacy regulations like GDPR.
+- **Scalability:** Each service can scale, migrate, or optimize its database independently, without affecting the others.
+- **Autonomy:** Teams can evolve their services and database schemas without coordination overhead or risk of breaking other services.
+- **Failure Isolation:** Problems in one database (like corruption or migration errors) won’t directly impact the other service.
+
+Also, the services communicate **only via the message broker (Redis)** and have no direct knowledge of each other’s internal data structures or storage. This further enforces the microservices principle of independent, decoupled components.
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Node.js 18+ (for local development only)
+
+### Installation & Setup
+
+1. **Clone the repository**
+
+```sh
+git clone https://github.com/bumbaRasch/css_ecommerce.git
+cd css_ecommerce
 ```
 
-## Compile and run the project
+2. **Copy `.env.example`**
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```sh
+cp .env.example .env
 ```
 
-## Run tests
+3. **Start all services**
 
-```bash
-# unit tests
-$ npm run test
+This will start all services, databases, Redis, and Adminer for DB inspection.
 
-# e2e tests
-$ npm run test:e2e
+- To start all services with logs:
 
-# test coverage
-$ npm run test:cov
+```sh
+docker-compose up --build
 ```
 
-## Deployment
+- To start all services in detached mode (without logs):
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```sh
+docker-compose up --build -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+4. **Seed data**
 
-## Resources
+To generate test data, use the following commands:
+Where <number> is the number of records to create (e.g., 10).
 
-Check out a few resources that may come in handy when working with NestJS:
+Create customers
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```sh
+docker compose exec customers-service npm run seed:customers -- <number>
+```
 
-## Support
+Create products
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```sh
+docker compose exec products-service npm run seed:products -- <number>
+```
 
-## Stay in touch
+### 📂 Project Structure
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```markdown
+ecommerce-monorepo-challenge/
+├── apps/
+│ ├── api-gateway/ # API Gateway service
+│ ├── customers-service/ # Customer management service
+│ └── products-service/ # Product management service
+├── libs/ # Shared libraries and utilities
+├── docker-compose.yml # Docker Compose configuration
+├── .env # Environment variables
+└── README.md # Dcumentation
+```
 
-## License
+### 📡 API Endpoints
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Endpoint             | Method | Description                               |
+| -------------------- | ------ | ----------------------------------------- |
+| `/api/customers`     | GET    | Retrieve all customers                    |
+| `/api/customers/:id` | GET    | Get customer by ID with favorite products |
+
+### Check API
+
+The API is available at: http://localhost:3000/api/customers
+
+- Get all customers:
+
+```sh
+curl http://localhost:3000/api/customers
+```
+
+- Get a customer with "favorite" products:
+
+```sh
+curl http://localhost:3000/api/customers/1
+```
+
+Example Response
+
+```json
+{
+  "id": 31,
+  "name": "Reginald Yost PhD",
+  "email": "Adelia.Gorczany@yahoo.com",
+  "createdAt": "2025-05-04T21:40:45.053Z",
+  "updatedAt": "2025-05-04T21:40:45.053Z",
+  "favorites": [
+    {
+      "id": 68339,
+      "name": "Sleek Bronze Pants",
+      "description": "Professional-grade Keyboard perfect for nippy training and recreational use",
+      "price": 356.29,
+      "createdAt": "2025-05-04T21:41:22.854Z",
+      "updatedAt": "2025-05-04T21:41:22.854Z"
+    },
+    {
+      "id": 25587,
+      "name": "Tasty Granite Cheese",
+      "description": "The sleek and self-reliant Computer comes with salmon LED lighting for smart functionality",
+      "price": 336.79,
+      "createdAt": "2025-05-04T21:41:22.854Z",
+      "updatedAt": "2025-05-04T21:41:22.854Z"
+    }
+  ]
+}
+```
+
+## ⚙️ Configuration
+
+The application uses environment variables defined in `.env` file:
+
+### Database Configuration
+
+- `MYSQL_CUSTOMERS_URL`: Connection string for customers database
+- `MYSQL_PRODUCTS_URL`: Connection string for products database
+
+### Redis Configuration
+
+- `REDIS_HOST`: Redis server hostname
+- `REDIS_PORT`: Redis server port
+- `REDIS_PASSWORD`: Redis authentication password
+
+### Application Settings
+
+- `API_GATEWAY_PORT`: Port for the API Gateway service
+- `FAVORITE_PRODUCTS_COUNT`: Number of random products to include
+
+## 🛡 Error Handling
+
+The application implements the following error handling strategies:
+
+- **Not Found errors**: 404 responses for non-existent resources
