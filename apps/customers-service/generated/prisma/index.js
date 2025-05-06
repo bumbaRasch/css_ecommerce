@@ -160,12 +160,11 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "MYSQL_CUSTOMERS_URL",
-        "value": null
+        "value": "mysql://customer_user:customer_password@localhost:3306/customers_db"
       }
     }
   },
