@@ -6,7 +6,6 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - NODE_ENV=production
       - FAVORITE_PRODUCTS_COUNT=${FAVORITE_PRODUCTS_COUNT}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
